@@ -16,6 +16,7 @@ class UpdateCustomerRequest extends FormRequest
         return [
             'phone' => ['sometimes', 'string', Rule::unique('users', 'phone')->ignore($userId)],
             'password' => ['nullable', 'string', 'min:8'],
+            'is_admin' => ['sometimes', 'boolean'],
         ];
     }
 }

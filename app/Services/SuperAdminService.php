@@ -21,9 +21,18 @@ class SuperAdminService
 
     public function updateCustomerCredentials(User $customer, array $data): User
     {
+        if ($customer->isSuperAdmin()) {
+            throw new \Exception('Cannot update super admin credentials');
+        }
+        
+        if (isset($data['is_admin'])) {
+            $data['role'] = $data['is_admin'] == 1 ? 'admin' : 'user';
+        }
+        
         $customer->update([
             'phone' => $data['phone'] ?? $customer->phone,
             'password' => isset($data['password']) ? Hash::make($data['password']) : $customer->password,
+            'role' => $data['role'] ?? $customer->role,
         ]);
 
         $customer->tokens()->delete();
