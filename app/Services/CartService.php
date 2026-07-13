@@ -85,7 +85,7 @@ class CartService
                 'action_url' => config('app.url')
             ];
 
-            Mail::to('admin@shenawy.com')->send(new AdminNotificationMail($notificationData));
+            Mail::to('ibrahimadel.dev@gmail.com')->send(new AdminNotificationMail($notificationData));
 
             return "https://wa.me/{$adminPhone}?text={$encodedMessage}";
         });
