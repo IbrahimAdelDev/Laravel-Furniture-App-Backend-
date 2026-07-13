@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  server:
+    image: nginx:alpine
+    container_name: shenawy_server
+    restart: always
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - shenawy_network
+    depends_on:
+      - app
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      args:
+        uid: ${UID:-1000}
+        user: ibrahim
+    container_name: shenawy_app
+    restart: always
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - shenawy_network
+    depends_on:
+      - db
+  
+  worker:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      args:
+        uid: ${UID:-1000}
+        user: ibrahim
+    container_name: shenawy_worker
+    restart: always
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    command: php artisan queue:work --tries=3 --timeout=90
+    networks:
+      - shenawy_network
+    depends_on:
+      - app
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: shenawy_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: shenawy_db
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - shenawy_network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: shenawy_phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "8080:80"
+    networks:
+      - shenawy_network
+    depends_on:
+      - db
+
+networks:
+  shenawy_network:
+    driver: bridge
+
+volumes:
+  db_data:
