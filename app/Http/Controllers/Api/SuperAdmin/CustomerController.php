@@ -14,9 +14,12 @@ class CustomerController extends Controller
 
     public function search(Request $request)
     {
-        $request->validate(['query' => 'required|string']);
+        $request->validate(['query' => 'nullable|string']);
+        
         $perPage = $request->query('per_page', 10);
-        $users = $this->service->searchCustomers($perPage, $request->query('query'));
+        
+        $users = $this->service->searchCustomers($perPage, $request->query('query'), $request->user()->id());
+        
         return response()->json(['data' => $users]);
     }
 

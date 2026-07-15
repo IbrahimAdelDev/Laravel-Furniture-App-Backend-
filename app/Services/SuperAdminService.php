@@ -8,12 +8,17 @@ use Illuminate\Database\Eloquent\Collection;
 
 class SuperAdminService
 {
-    public function searchCustomers(int $perPage, string $query): Collection
+    public function searchCustomers(int $perPage, ?string $query = null, ?int $currentUserId = null): Collection
     {
         return User::whereIn('role', ['user', 'admin'])
-            ->where(function ($q) use ($query) {
-                $q->where('phone', 'like', "%{$query}%")
-                  ->orWhere('name', 'like', "%{$query}%");
+            ->when($currentUserId, function ($q) use ($currentUserId) {
+                $q->where('id', '!=', $currentUserId);
+            })
+            ->when(!empty($query), function ($q) use ($query) {
+                $q->where(function ($sub) use ($query) {
+                    $sub->where('phone', 'like', "%{$query}%")
+                        ->orWhere('name', 'like', "%{$query}%");
+                });
             })
             ->limit($perPage)
             ->get(['id', 'name', 'phone']);
