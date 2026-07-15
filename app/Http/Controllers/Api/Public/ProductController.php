@@ -34,6 +34,8 @@ class ProductController extends Controller
     public function show(Product $product): JsonResponse
     {
         $productDetails = $this->productService->getProductDetails($product);
-        return response()->json(['data' => $productDetails]);
+        return response()->json([
+            'data' => new ProductResource($productDetails),
+        ]);
     }
 }
