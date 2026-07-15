@@ -18,7 +18,11 @@ class CustomerController extends Controller
         
         $perPage = $request->query('per_page', 10);
         
-        $users = $this->service->searchCustomers($perPage, $request->query('query'), $request->user()->id());
+        $users = $this->service->searchCustomers(
+            $perPage, 
+            $request->query('query'), 
+            $request->user()?->id
+        );
         
         return response()->json(['data' => $users]);
     }
