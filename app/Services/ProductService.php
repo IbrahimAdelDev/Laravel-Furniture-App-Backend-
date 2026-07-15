@@ -75,10 +75,19 @@ class ProductService
     }
 
     private function uploadImages(Product $product, array $images): void
-    {
-        foreach ($images as $image) {
-            $path = $image->store('products', 'public');
-            $product->images()->create(['image_path' => $path]);
+{
+    foreach ($images as $image) {
+        if (!$image->isValid()) {
+            throw new \Exception( 'Upload failed: ' . $image->getErrorMessage());
         }
+
+        $path = $image->store('products', 'public');
+
+        if (!$path) {
+            throw new \Exception('Failed to store image');
+        }
+
+        $product->images()->create(['image_path' => $path]);
     }
+}
 }
