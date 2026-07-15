@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Api\SuperAdmin\CustomerController;
 use App\Http\Controllers\Api\Admin\SettingController;
 use App\Http\Controllers\Api\User\ProfileController;
+use App\Http\Controllers\Api\User\FavoriteController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -36,6 +37,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/items/{cartItem}', [CartController::class, 'updateItem']);
         Route::delete('/items/{cartItem}', [CartController::class, 'removeItem']);
         Route::post('/checkout', [CartController::class, 'checkout']);
+    });
+
+    Route::prefix('favorites')->group(function () {
+        Route::get('/', [FavoriteController::class, 'index']);
+        Route::post('/toggle', [FavoriteController::class, 'toggle']);
     });
 
     Route::middleware('role:admin,super_admin')->prefix('admin/products')->group(function () {

@@ -45,4 +45,11 @@ class User extends Authenticatable
     {
         return $this->role === 'super_admin';
     }
+
+    public function favorites()
+{
+    return $this->belongsToMany(Product::class, 'favorites')
+                ->withTimestamps()
+                ->orderByPivot('created_at', 'desc');
+}
 }
